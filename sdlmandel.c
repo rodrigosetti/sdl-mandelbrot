@@ -22,10 +22,16 @@
 void sdl_draw_mandelbrot(SDL_Surface *surface, complex center, double zoom)
 {
     int f,x,y,n;
-    int maxiter = (WIDTH/10) * 0.049715909 * log10(zoom);
+    int maxiter = (WIDTH/2) * 0.049715909 * log10(zoom);
     complex z, c;
+    float C;
 
     static SDL_Rect rects[HEIGHT/FLIPS];
+
+    fprintf(stderr, "zoom: %f\n", zoom);
+    fprintf(stderr, "center point: %f %+fi\n", creal(center), 
+                                              cimag(center) );
+    fprintf(stderr, "iterations: %d\n", maxiter);
 
     for (f = 0; f < FLIPS; f++)
     {
@@ -48,13 +54,15 @@ void sdl_draw_mandelbrot(SDL_Surface *surface, complex center, double zoom)
                 else
                     /* Applies the actual mandelbrot formula on that point */
                     for (n = 0; n <= maxiter && cabs(z) < BAIL_OUT; n ++)
-                        z = cpow(cpow(cpow(cpow(z, 2) + c, 2) + c, 2) + c, 2)+c;
+                        z = cpow(z, 2) + c;
+
+                C = n - log2f(logf(cabs(z)) / M_LN2 );
 
                 /* Paint the pixel calculated depending on the number 
                    of iterations found */
                 ((Uint32*)surface->pixels)[(y*surface->w) + x] = (n >= maxiter)? 0 :
                     SDL_MapRGB( surface->format,
-                    (1.+sin(n*0.27 + 5))*127., (1+cos(n*0.85))*127., (1.+sin(n*0.15))*127. );
+                    (1+sin(C*0.27 + 5))*127., (1+cos(C*0.85))*127., (1+sin(C*0.15))*127. );
             }
             rects[y/FLIPS].x = 0;
             rects[y/FLIPS].y = y;
