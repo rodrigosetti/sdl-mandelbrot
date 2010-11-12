@@ -37,9 +37,18 @@ void sdl_draw_mandelbrot(SDL_Surface *surface, complex center, double zoom)
                 z = c = creal(center) + ((x - (WIDTH/2))/zoom) + 
                     ((cimag(center) + ((y - (HEIGHT/2))/zoom))*_Complex_I);
 
-                /* Applies the actual mandelbrot formula on that point */
-                for (n=0; n < maxiter && cabs(z) < BAIL_OUT; n ++)
-                    z = cpow(cpow(cpow(cpow(z, 2) + c, 2) + c, 2) + c, 2) + c;
+                #define X creal(z)
+                #define Y cimag(z)
+
+                /* Check if point lies within the main cardiod or 
+                   in the period-2 buld */
+                if ( (pow(X-.25,2) + pow(Y,2))*(pow(X,2) + (X/2) + pow(Y,2) - .1875) < pow(Y,2)/4 ||
+                     pow(X+1,2) + pow(Y,2) < .0625 )
+                    n = maxiter;
+                else
+                    /* Applies the actual mandelbrot formula on that point */
+                    for (n = 0; n <= maxiter && cabs(z) < BAIL_OUT; n ++)
+                        z = cpow(cpow(cpow(cpow(z, 2) + c, 2) + c, 2) + c, 2)+c;
 
                 /* Paint the pixel calculated depending on the number 
                    of iterations found */
