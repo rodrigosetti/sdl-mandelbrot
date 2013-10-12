@@ -8,22 +8,22 @@
 #include <math.h>
 #include <complex.h>
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 800
+#define HEIGHT 600
 
-#define START_POS   0
-#define START_ZOOM  (WIDTH*0.125296875f)
+#define START_POS   -0.5
+#define START_ZOOM  (WIDTH * 0.25296875f)
 
 #define BAIL_OUT        2.0
 #define FLIPS           24
 
 #define ZOOM_FACTOR     4
 
-void sdl_draw_mandelbrot(SDL_Surface *surface, complex center, double zoom)
+void sdl_draw_mandelbrot(SDL_Surface *surface, complex double center, double zoom)
 {
     int f,x,y,n;
     int maxiter = (WIDTH/2) * 0.049715909 * log10(zoom);
-    complex z, c;
+    complex double z, c;
     float C;
 
     static SDL_Rect rects[HEIGHT/FLIPS];
@@ -85,8 +85,7 @@ int main(int argc, char **argv)
 
     SDL_Surface *surface;
 
-    surface = SDL_SetVideoMode(WIDTH, HEIGHT, 32, 
-                               SDL_HWSURFACE | SDL_FULLSCREEN );
+    surface = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE);
     if ( surface == NULL )
     {
         fprintf(stderr, "Could not setup screen to resolution %dx%d : %s\n", 
