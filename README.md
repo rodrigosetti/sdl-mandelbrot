@@ -1,5 +1,7 @@
 # SDL-Mandelbrot
 
+![screenshot](screenshot.png "Screenshot")
+
 This is an implementation of the Mandelbrot Set fractal in C, using the SDL
 graphics library.
 
