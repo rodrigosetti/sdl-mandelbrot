@@ -1,7 +1,7 @@
 #ifdef _MSC_VER
 #include <SDL.h>
 #else
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #endif /* _MSC_VER */
 
 #include <stdio.h>
@@ -19,7 +19,7 @@
 
 #define ZOOM_FACTOR     4
 
-void sdl_draw_mandelbrot(SDL_Surface *surface, complex double center, double zoom)
+void sdl_draw_mandelbrot(SDL_Window *window, SDL_Surface *surface, complex double center, double zoom)
 {
     int f,x,y,n;
     int maxiter = (WIDTH/2) * 0.049715909 * log10(zoom);
@@ -69,7 +69,8 @@ void sdl_draw_mandelbrot(SDL_Surface *surface, complex double center, double zoo
             rects[y/FLIPS].w = WIDTH;
             rects[y/FLIPS].h = 1;
         }
-        SDL_UpdateRects(surface, HEIGHT/FLIPS, rects);
+        
+        SDL_UpdateWindowSurface(window);
     }
 }
 
@@ -83,21 +84,23 @@ int main(int argc, char **argv)
     }
     atexit(SDL_Quit);
 
-    SDL_Surface *surface;
+    SDL_Window *window;
 
-    surface = SDL_SetVideoMode(WIDTH, HEIGHT, 32, SDL_HWSURFACE);
-    if ( surface == NULL )
-    {
-        fprintf(stderr, "Could not setup screen to resolution %dx%d : %s\n", 
-                WIDTH, HEIGHT, SDL_GetError());
-        exit(1);
-    }
+    window = SDL_CreateWindow("SDL Mandelbrot",
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
+            WIDTH,
+            HEIGHT,
+            SDL_WINDOW_OPENGL
+            );
+
+    SDL_Surface* surface = SDL_GetWindowSurface(window);
 
     /* Initialize variables */
     double complex center = START_POS;
     double zoom = START_ZOOM;
 
-    sdl_draw_mandelbrot(surface, center, zoom);
+    sdl_draw_mandelbrot(window, surface, center, zoom);
 
     SDL_Event event;
     while(1)
@@ -113,7 +116,7 @@ int main(int argc, char **argv)
                 {
                     center = START_POS;
                     zoom = START_ZOOM;
-                    sdl_draw_mandelbrot(surface, center, zoom);
+                    sdl_draw_mandelbrot(window, surface, center, zoom);
                 }
                 else if (event.key.keysym.sym == SDLK_ESCAPE)
                 {
@@ -130,10 +133,13 @@ int main(int argc, char **argv)
                 else if (event.button.button == 3)
                     zoom /= ZOOM_FACTOR;
 
-                sdl_draw_mandelbrot(surface, center, zoom);
+                sdl_draw_mandelbrot(window, surface, center, zoom);
                 break;
         }
     }
+    
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
     return 0;
 }
